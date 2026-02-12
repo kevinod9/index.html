@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Those FUCKIN Guys - HaHa Leaderboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: #0a0a0a;
+    color: #e5e5e5;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: #737373;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat-card {
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 20px 28px;
+    text-align: center;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fbbf24;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 48px 1fr 100px 100px 120px;
+    align-items: center;
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 16px 20px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .row:hover {
+    border-color: #404040;
+    background: #1a1a1a;
+  }
+
+  .row.top-3 { border-color: #422006; }
+  .row.rank-1 { background: linear-gradient(135deg, #1a1505, #171717); border-color: #fbbf24; }
+  .row.rank-2 { background: linear-gradient(135deg, #18170f, #171717); border-color: #a8a29e; }
+  .row.rank-3 { background: linear-gradient(135deg, #1a1610, #171717); border-color: #b45309; }
+
+  .rank {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #525252;
+  }
+
+  .rank-1 .rank { color: #fbbf24; }
+  .rank-2 .rank { color: #a8a29e; }
+  .rank-3 .rank { color: #b45309; }
+
+  .name-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #e5e5e5;
+  }
+
+  .name-sub {
+    font-size: 0.75rem;
+    color: #525252;
+  }
+
+  .messages, .hahas {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #a3a3a3;
+  }
+
+  .rate {
+    text-align: right;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .rate-high { color: #fbbf24; }
+  .rate-mid { color: #fb923c; }
+  .rate-low { color: #78716c; }
+
+  .bar-bg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    border-radius: 0 0 12px 12px;
+    opacity: 0.6;
+    transition: width 0.8s ease;
+  }
+
+  .header-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 100px 100px 120px;
+    padding: 0 20px 8px;
+    font-size: 0.7rem;
+    color: #525252;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .header-row span:nth-child(3),
+  .header-row span:nth-child(4) { text-align: center; }
+  .header-row span:last-child { text-align: right; }
+
+  .medal { margin-right: 4px; }
+
+  .you-badge {
+    display: inline-block;
+    background: #1e3a5f;
+    color: #60a5fa;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    gap: 0;
+  }
+
+  .toggle-btn {
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #333;
+    background: #171717;
+    color: #737373;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .toggle-btn:first-child { border-radius: 8px 0 0 8px; }
+  .toggle-btn:not(:first-child) { border-left: none; }
+  .toggle-btn:last-child { border-radius: 0 8px 8px 0; }
+
+  .toggle-btn.active {
+    background: #fbbf24;
+    color: #0a0a0a;
+    border-color: #fbbf24;
+  }
+
+  .toggle-btn:hover:not(.active) {
+    background: #262626;
+    color: #a3a3a3;
+  }
+
+  .footnote {
+    text-align: center;
+    margin-top: 40px;
+    color: #404040;
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 640px) {
+    .row {
+      grid-template-columns: 36px 1fr 70px 70px 80px;
+      padding: 12px 14px;
+    }
+    .header-row {
+      grid-template-columns: 36px 1fr 70px 70px 80px;
+    }
+    h1 { font-size: 1.6rem; }
+    .stat-card { min-width: 120px; padding: 14px 16px; }
+    .stat-value { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Those FUCKIN Guys</h1>
+    <div class="subtitle">HaHa Reaction Leaderboard</div>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value">134,710</div>
+      <div class="stat-label">Total Messages</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">11,505</div>
+      <div class="stat-label">Total HaHas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">16</div>
+      <div class="stat-label">Members</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">2.5 yrs</div>
+      <div class="stat-label">Since Jul 2023</div>
+    </div>
+  </div>
+
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" data-mode="rate">HaHa Rate</button>
+    <button class="toggle-btn" data-mode="hahas">Total HaHas</button>
+    <button class="toggle-btn" data-mode="given">HaHas Given</button>
+  </div>
+
+  <div class="header-row" id="header-row">
+    <span>#</span>
+    <span>Name</span>
+    <span>Messages</span>
+    <span>HaHas</span>
+    <span id="sort-label">HaHa Rate</span>
+  </div>
+
+  <div class="leaderboard" id="leaderboard"></div>
+
+  <div class="footnote">
+    Data pulled from iMessage &middot; HaHa Rate = total HaHa reactions received &divide; messages sent &middot; Feb 2026
+  </div>
+</div>
+
+<script>
+const data = [
+  // UPDATE NAMES HERE — replace "NAME?" with the person's name
+  { id: "+19084878348", name: "Lopes", phone: "(908) 487-8348", msgs: 410, hahas: 117, rate: 0.2854, from: "Oct 2024" },
+  { id: "+19089671818", name: "Wade", phone: "(908) 967-1818", msgs: 2018, hahas: 332, rate: 0.1645, from: "Jul 2023" },
+  { id: "+19083779132", name: "Jon", phone: "(908) 377-9132", msgs: 4325, hahas: 593, rate: 0.1371, from: "Jul 2023" },
+  { id: "+19088388294", name: "Joe C", phone: "(908) 838-8294", msgs: 8041, hahas: 1098, rate: 0.1366, from: "Jul 2023" },
+  { id: "+19083476087", name: "Max", phone: "(908) 347-6087", msgs: 2929, hahas: 384, rate: 0.1311, from: "Jul 2023" },
+  { id: "+19083778438", name: "Rick", phone: "(908) 377-8438", msgs: 5893, hahas: 692, rate: 0.1174, from: "Jul 2023" },
+  { id: "+19084472652", name: "Dan C", phone: "(908) 447-2652", msgs: 3645, hahas: 421, rate: 0.1155, from: "Jan 2025" },
+  { id: "+19084999507", name: "Donny", phone: "(908) 499-9507", msgs: 1693, hahas: 195, rate: 0.1152, from: "Jul 2024" },
+  { id: "+19083778217", name: "Stein", phone: "(908) 377-8217", msgs: 8486, hahas: 727, rate: 0.0857, from: "Jul 2023" },
+  { id: "+13025886213", name: "Julian", phone: "(302) 588-6213", msgs: 6095, hahas: 498, rate: 0.0817, from: "Sep 2024" },
+  { id: "Me", name: "Me", phone: "", msgs: 23980, hahas: 1955, rate: 0.0815, from: "Jul 2023", isMe: true },
+  { id: "+19088685354", name: "Doc", phone: "(908) 868-5354", msgs: 34634, hahas: 2646, rate: 0.0764, from: "Feb 2024" },
+  { id: "+19083007706", name: "Ruka", phone: "(908) 300-7706", msgs: 18841, hahas: 1294, rate: 0.0687, from: "Jul 2023" },
+  { id: "+19084779562", name: "Gay Gav", phone: "(908) 477-9562", msgs: 10713, hahas: 509, rate: 0.0475, from: "Jul 2023" },
+  { id: "+19083475472", name: "Lu", phone: "(908) 347-5472", msgs: 959, hahas: 44, rate: 0.0459, from: "Sep 2025" },
+  { id: "+16179329461", name: "NAME?", phone: "(617) 932-9461", msgs: 40, hahas: 0, rate: 0.0, from: "Aug 2025" },
+];
+
+// HaHas given data (keyed by id)
+const givenData = {
+  "Me": 1975,
+  "+19088685354": 1584,
+  "+19083007706": 1558,
+  "+19088388294": 1376,
+  "+19083778438": 1191,
+  "+19084779562": 1156,
+  "+13025886213": 737,
+  "+19083779132": 600,
+  "+19084472652": 587,
+  "+19083778217": 428,
+  "+19083476087": 230,
+  "+19089671818": 83,
+  "+19084878348": 64,
+  "+19084999507": 53,
+  "+19083475472": 0,
+  "+16179329461": 1,
+};
+
+// Add given count to each person
+data.forEach(p => { p.given = givenData[p.id] || 0; });
+
+const medals = ["&#x1F947;", "&#x1F948;", "&#x1F949;"];
+let currentMode = "rate";
+
+document.querySelectorAll(".toggle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentMode = btn.dataset.mode;
+    document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  });
+});
+
+function render() {
+  const isGiven = currentMode === "given";
+  const sortKey = isGiven ? "given" : currentMode;
+  const sorted = [...data].sort((a, b) => b[sortKey] - a[sortKey]);
+  const maxVal = sorted[0][sortKey];
+  const lb = document.getElementById("leaderboard");
+  lb.innerHTML = "";
+
+  // Update header
+  const labels = { rate: "HaHa Rate", hahas: "Total HaHas", given: "HaHas Given" };
+  document.getElementById("sort-label").textContent = labels[currentMode];
+
+  sorted.forEach((p, i) => {
+    const rank = i + 1;
+    const val = p[sortKey];
+    const rateClass = isGiven
+      ? (val > 1000 ? "rate-high" : val > 400 ? "rate-mid" : "rate-low")
+      : (p.rate > 0.12 ? "rate-high" : p.rate > 0.06 ? "rate-mid" : "rate-low");
+    const rankClass = rank <= 3 ? `top-3 rank-${rank}` : "";
+    const barWidth = maxVal > 0 ? (val / maxVal * 100).toFixed(1) : 0;
+    const medal = rank <= 3 ? `<span class="medal">${medals[i]}</span>` : "";
+    const youBadge = p.isMe ? `<span class="you-badge">You</span>` : "";
+
+    let valueDisplay;
+    if (currentMode === "rate") valueDisplay = (p.rate * 100).toFixed(1) + "%";
+    else if (currentMode === "hahas") valueDisplay = p.hahas.toLocaleString();
+    else valueDisplay = p.given.toLocaleString();
+
+    lb.innerHTML += `
+      <div class="row ${rankClass}">
+        <div class="rank">${rank}</div>
+        <div class="name-col">
+          <div class="name">${medal}${p.name}${youBadge}</div>
+          <div class="name-sub">${p.phone ? p.phone + ' · ' : ''}Active since ${p.from}</div>
+        </div>
+        <div class="messages">${p.msgs.toLocaleString()}</div>
+        <div class="hahas">${p.hahas.toLocaleString()}</div>
+        <div class="rate ${rateClass}">${valueDisplay}</div>
+        <div class="bar-bg" style="width: ${barWidth}%"></div>
+      </div>
+    `;
+  });
+}
+
+render();
+</script>
+</body>
+</html>
